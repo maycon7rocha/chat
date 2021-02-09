@@ -17,7 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
 
   Future<void> _handleSubmit(AuthData authData) async {
-    print(authData.email);
+    // print(authData.email);
     setState(() {
       _isLoading = true;
     });

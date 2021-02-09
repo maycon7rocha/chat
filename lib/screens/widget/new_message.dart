@@ -11,13 +11,17 @@ class _NewMessageState extends State<NewMessage> {
   final _controller = TextEditingController();
   String _enteredMessage = '';
 
-  Future<void> _sendMessage() async{
+  Future<void> _sendMessage() async {
     FocusScope.of(context).unfocus();
     final user = await FirebaseAuth.instance.currentUser();
+    final userData =
+        await Firestore.instance.collection('users').document(user.uid).get();
+    
     Firestore.instance.collection('chat').add({
       'text': _enteredMessage,
       'createdAt': Timestamp.now(),
       'userId': user.uid,
+      'userName': userData['name'],
     });
 
     _controller.clear();
@@ -25,25 +29,28 @@ class _NewMessageState extends State<NewMessage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              decoration: InputDecoration(labelText: 'Enviar mensagem'),
-              onChanged: (value) {
-                setState(() {
-                  _enteredMessage = value;
-                });
-              },
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Container(
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                decoration: InputDecoration(labelText: 'Enviar mensagem'),
+                onChanged: (value) {
+                  setState(() {
+                    _enteredMessage = value;
+                  });
+                },
+              ),
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: _enteredMessage.trim().isEmpty ? null : _sendMessage,
-          ),
-        ],
+            IconButton(
+              icon: Icon(Icons.send),
+              onPressed: _enteredMessage.trim().isEmpty ? null : _sendMessage,
+            ),
+          ],
+        ),
       ),
     );
   }

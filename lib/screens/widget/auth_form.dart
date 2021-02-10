@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:chat/models/auth_data.dart';
+import 'package:chat/screens/widget/user_image_picker.dart';
 import 'package:flutter/material.dart';
 
 class AuthForm extends StatefulWidget {
@@ -18,9 +21,24 @@ class _AuthFormState extends State<AuthForm> {
     bool isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus();
 
+    if (_authData.image == null && _authData.isSigup) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('precisamos da sua foto!'),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
+
+      return;
+    }
+
     if (isValid) {
       widget.onSubmit(_authData);
     }
+  }
+
+  void _handPickedImage(File image) {
+    _authData.image = image;
   }
 
   @override
@@ -35,6 +53,7 @@ class _AuthFormState extends State<AuthForm> {
               key: _formKey,
               child: Column(
                 children: [
+                  if (_authData.isSigup) UserImagePicker(_handPickedImage),
                   if (_authData.isSigup)
                     TextFormField(
                       key: ValueKey('name'),
